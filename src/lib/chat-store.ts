@@ -3,11 +3,23 @@
 
 export type ChatRole = "user" | "assistant";
 
+export interface ActivityStep {
+  id: string;
+  label: string;
+  status: "running" | "done" | "error";
+  agent?: string;
+  detail?: string;
+}
+
 export interface ChatMessage {
   id: string;
   role: ChatRole;
   content: string;
   createdAt: number;
+  reasoning?: string;
+  steps?: ActivityStep[];
+  agentName?: string;
+  agentEmoji?: string;
 }
 
 export interface ChatThread {
