@@ -278,3 +278,11 @@
 .dark .shiki, .dark .shiki span {
   color: var(--shiki-dark) !important;
 }
+
+.shimmer-text {
+  animation: shimmer-pulse 1.6s ease-in-out infinite;
+}
+@keyframes shimmer-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}

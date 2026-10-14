@@ -5,11 +5,13 @@ import { Check, Copy, RefreshCw } from "lucide-react";
 import {
   ActionBarPrimitive,
   MessagePrimitive,
+  useMessage,
   type TextMessagePartComponent,
 } from "@assistant-ui/react";
 
 import { Markdown } from "@/components/chat/markdown";
 import { AriaMark } from "@/components/chat/brand";
+import { ActivityPanel, useChatMessage } from "@/components/chat/activity";
 import { cn } from "@/lib/utils";
 
 function TypingDots() {
@@ -50,6 +52,9 @@ function IconButton({ children }: { children: React.ReactNode }) {
 }
 
 export function AssistantMessage() {
+  const id = useMessage((m) => m.id);
+  const running = useMessage((m) => m.status?.type === "running");
+  const msg = useChatMessage(id);
   return (
     <MessagePrimitive.Root asChild>
       <motion.div
@@ -58,11 +63,20 @@ export function AssistantMessage() {
         transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
         className="group/msg mx-auto flex w-full max-w-3xl gap-3.5 px-4 py-5 sm:px-6"
       >
-        <div className="mt-0.5 size-8 shrink-0 overflow-hidden rounded-full border border-border bg-card shadow-soft">
-          <img src={AriaMark} alt="Aria" width={32} height={32} className="size-full object-contain p-1" />
+        <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-card text-base shadow-soft">
+          {msg?.agentEmoji ? (
+            <span aria-hidden>{msg.agentEmoji}</span>
+          ) : (
+            <img src={AriaMark} alt="Aria" width={32} height={32} className="size-full object-contain p-1" />
+          )}
         </div>
         <div className="min-w-0 flex-1">
+          {msg?.agentName && (
+            <p className="mb-1 text-xs font-semibold text-muted-foreground">{msg.agentName}</p>
+          )}
+          {msg && <ActivityPanel message={msg} running={running} />}
           <MessagePrimitive.Parts components={{ Text: AssistantText }} />
+
           <ActionBarPrimitive.Root
             hideWhenRunning
             autohide="not-last"

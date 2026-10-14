@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { MessagesContext } from "@/components/chat/activity";
 import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, MessageSquarePlus, X } from "lucide-react";
@@ -13,10 +14,13 @@ import { useAriaRuntime } from "@/hooks/use-aria-runtime";
 import { genId } from "@/lib/chat-store";
 
 function RuntimeRegion({ threadId }: { threadId: string }) {
-  const runtime = useAriaRuntime(threadId);
+  const { runtime, messages } = useAriaRuntime(threadId);
+  const map = useMemo(() => new Map(messages.map((m) => [m.id, m])), [messages]);
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <Thread />
+      <MessagesContext.Provider value={map}>
+        <Thread />
+      </MessagesContext.Provider>
     </AssistantRuntimeProvider>
   );
 }

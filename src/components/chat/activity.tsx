@@ -10,7 +10,8 @@ import { cn } from "@/lib/utils";
 export const MessagesContext = createContext<Map<string, ChatMessage>>(new Map());
 
 export function useChatMessage(id: string | undefined) {
-  return id ? useContext(MessagesContext).get(id) : undefined;
+  const map = useContext(MessagesContext);
+  return id ? map.get(id) : undefined;
 }
 
 export function ActivityPanel({ message, running }: { message: ChatMessage; running: boolean }) {
