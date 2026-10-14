@@ -80,7 +80,7 @@ export const Route = createFileRoute("/api/chat")({
               });
               let started = false;
               for await (const part of result.fullStream) {
-                if (part.type === "reasoning-delta") send({ type: "reasoning", delta: part.delta });
+                if (part.type === "reasoning-delta") send({ type: "reasoning", delta: ((part as unknown as { text?: string }).text ?? "") });
                 else if (part.type === "text-delta") {
                   if (!started) {
                     started = true;
@@ -166,7 +166,7 @@ export const Route = createFileRoute("/api/chat")({
                   providerOptions: { lovable: { reasoningEffort: depth } },
                 });
                 for await (const part of result.fullStream) {
-                  if (part.type === "reasoning-delta") origSend({ type: "reasoning", delta: part.delta });
+                  if (part.type === "reasoning-delta") origSend({ type: "reasoning", delta: ((part as unknown as { text?: string }).text ?? "") });
                   else if (part.type === "text-delta") {
                     if (!thoughtClosed) {
                       thoughtClosed = true;
