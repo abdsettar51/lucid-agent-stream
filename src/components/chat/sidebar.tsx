@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { MessageSquarePlus, Trash2, MessagesSquare } from "lucide-react";
 
 import { AriaLogo } from "@/components/chat/brand";
+import { AgentPicker } from "@/components/chat/agent-picker";
 import {
   deleteThread,
   genId,
@@ -58,6 +59,8 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
           New conversation
         </button>
       </div>
+
+      <AgentPicker />
 
       <div className="px-4 pb-1 pt-3">
         <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
