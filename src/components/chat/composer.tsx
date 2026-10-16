@@ -150,7 +150,7 @@ export function Composer() {
         <div className="mb-2 flex justify-center empty:hidden">
           <ActiveSkillChip />
         </div>
-        <ComposerPrimitive.Root className="relative flex items-end gap-1.5 rounded-3xl border border-border bg-card/90 p-2 pl-3 shadow-float backdrop-blur-xl transition-colors focus-within:border-primary/50 sm:gap-2 sm:pl-4">
+        <ComposerPrimitive.Root className="relative flex items-end gap-1.5 rounded-3xl border border-border bg-card p-2 pl-3 shadow-float transition-colors focus-within:border-primary/50 sm:gap-2 sm:pl-4">
           <SkillsMenu />
           <ComposerPrimitive.Input
             autoFocus
