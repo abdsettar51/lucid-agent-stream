@@ -66,12 +66,27 @@ function SkillsMenu() {
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: 8, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 8, scale: 0.97 }}
-            transition={{ duration: 0.15 }}
-            className="absolute bottom-12 right-0 z-30 w-64 rounded-2xl border border-border bg-card p-1.5 shadow-float"
+            key="backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setOpen(false)}
+            className="fixed inset-0 z-40 bg-foreground/30 backdrop-blur-[2px] sm:bg-transparent sm:backdrop-blur-none"
+          />
+        )}
+        {open && (
+          <motion.div
+            key="menu"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 24 }}
+            transition={{ type: "spring", damping: 30, stiffness: 340 }}
+            className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-2 gap-2 rounded-t-3xl border border-border bg-card p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-float sm:absolute sm:inset-x-auto sm:bottom-12 sm:left-0 sm:block sm:w-72 sm:space-y-0.5 sm:rounded-2xl sm:p-1.5"
           >
+            <div className="col-span-2 mb-1 flex flex-col items-center gap-2 sm:hidden">
+              <span className="h-1 w-10 rounded-full bg-muted" />
+              <p className="text-sm font-semibold">اختر مهارة</p>
+            </div>
             {SKILLS.map((s) => {
               const Icon = SKILL_ICONS[s.id];
               const active = skill === s.id;
@@ -84,16 +99,18 @@ function SkillsMenu() {
                     setOpen(false);
                   }}
                   className={cn(
-                    "flex w-full items-center gap-3 rounded-xl px-3 py-2 text-right transition-colors hover:bg-accent",
-                    active && "bg-accent",
+                    "relative flex min-w-0 flex-col items-start gap-2 rounded-2xl border border-border p-3 text-right transition-colors hover:bg-accent sm:w-full sm:flex-row sm:items-center sm:gap-3 sm:rounded-xl sm:border-0 sm:px-3 sm:py-2",
+                    active && "border-primary/50 bg-accent",
                   )}
                 >
-                  <Icon className="size-4 shrink-0 text-primary" />
-                  <span className="flex-1">
-                    <span className="block text-sm font-medium">{s.label}</span>
-                    <span className="block text-[11px] text-muted-foreground">{s.hint}</span>
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 sm:size-auto sm:bg-transparent">
+                    <Icon className="size-4 text-primary" />
                   </span>
-                  {active && <Check className="size-4 text-primary" />}
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-medium">{s.label}</span>
+                    <span className="block text-[11px] leading-snug text-muted-foreground">{s.hint}</span>
+                  </span>
+                  {active && <Check className="absolute left-3 top-3 size-4 text-primary sm:static" />}
                 </button>
               );
             })}
@@ -130,9 +147,11 @@ export function Composer() {
     <div className="pointer-events-none sticky bottom-0 z-10 px-3 pb-4 sm:px-6 sm:pb-6">
       <div className="pointer-events-auto mx-auto w-full max-w-3xl">
         <ModeToggle />
-        <ComposerPrimitive.Root className="relative flex items-end gap-2 rounded-3xl border border-border bg-card/90 p-2 pl-4 shadow-float backdrop-blur-xl transition-colors focus-within:border-primary/50">
-          <SkillsMenu />
+        <div className="mb-2 flex justify-center empty:hidden">
           <ActiveSkillChip />
+        </div>
+        <ComposerPrimitive.Root className="relative flex items-end gap-1.5 rounded-3xl border border-border bg-card p-2 pl-3 shadow-float transition-colors focus-within:border-primary/50 sm:gap-2 sm:pl-4">
+          <SkillsMenu />
           <ComposerPrimitive.Input
             autoFocus
             rows={1}
