@@ -120,3 +120,25 @@ export function setActiveAgent(id: string) {
 export function setMode(mode: ChatMode) {
   commit({ ...getAgentState(), mode });
 }
+
+// ---- Composer skills (one active at a time, not persisted) ----
+export type SkillId = "deep-think" | "deep-research" | "code" | "write" | "summarize" | "brainstorm";
+export const SKILLS: { id: SkillId; label: string; hint: string }[] = [
+  { id: "deep-think", label: "تفكير عميق", hint: "يفكر مطولاً قبل الإجابة" },
+  { id: "deep-research", label: "بحث عميق", hint: "تقرير شامل متعدد المصادر والزوايا" },
+  { id: "code", label: "برمجة", hint: "كود نظيف مع شرح" },
+  { id: "write", label: "كتابة", hint: "نصوص ومقالات احترافية" },
+  { id: "summarize", label: "تلخيص", hint: "نقاط مختصرة وواضحة" },
+  { id: "brainstorm", label: "عصف ذهني", hint: "أفكار كثيرة ومتنوعة" },
+];
+let skill: SkillId | null = null;
+const skillListeners = new Set<() => void>();
+export function getSkill() { return skill; }
+export function setSkill(s: SkillId | null) { skill = s; skillListeners.forEach((l) => l()); }
+export function useSkill() {
+  return useSyncExternalStore(
+    (l) => { skillListeners.add(l); return () => skillListeners.delete(l); },
+    () => skill,
+    () => null,
+  );
+}
