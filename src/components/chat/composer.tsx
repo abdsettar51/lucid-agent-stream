@@ -99,16 +99,18 @@ function SkillsMenu() {
                     setOpen(false);
                   }}
                   className={cn(
-                    "flex w-full items-center gap-3 rounded-xl px-3 py-2 text-right transition-colors hover:bg-accent",
-                    active && "bg-accent",
+                    "relative flex min-w-0 flex-col items-start gap-2 rounded-2xl border border-border p-3 text-right transition-colors hover:bg-accent sm:w-full sm:flex-row sm:items-center sm:gap-3 sm:rounded-xl sm:border-0 sm:px-3 sm:py-2",
+                    active && "border-primary/50 bg-accent",
                   )}
                 >
-                  <Icon className="size-4 shrink-0 text-primary" />
-                  <span className="flex-1">
-                    <span className="block text-sm font-medium">{s.label}</span>
-                    <span className="block text-[11px] text-muted-foreground">{s.hint}</span>
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 sm:size-auto sm:bg-transparent">
+                    <Icon className="size-4 text-primary" />
                   </span>
-                  {active && <Check className="size-4 text-primary" />}
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-medium">{s.label}</span>
+                    <span className="block text-[11px] leading-snug text-muted-foreground">{s.hint}</span>
+                  </span>
+                  {active && <Check className="absolute left-3 top-3 size-4 text-primary sm:static" />}
                 </button>
               );
             })}
@@ -145,9 +147,11 @@ export function Composer() {
     <div className="pointer-events-none sticky bottom-0 z-10 px-3 pb-4 sm:px-6 sm:pb-6">
       <div className="pointer-events-auto mx-auto w-full max-w-3xl">
         <ModeToggle />
-        <ComposerPrimitive.Root className="relative flex items-end gap-2 rounded-3xl border border-border bg-card/90 p-2 pl-4 shadow-float backdrop-blur-xl transition-colors focus-within:border-primary/50">
-          <SkillsMenu />
+        <div className="mb-2 flex justify-center empty:hidden">
           <ActiveSkillChip />
+        </div>
+        <ComposerPrimitive.Root className="relative flex items-end gap-1.5 rounded-3xl border border-border bg-card/90 p-2 pl-3 shadow-float backdrop-blur-xl transition-colors focus-within:border-primary/50 sm:gap-2 sm:pl-4">
+          <SkillsMenu />
           <ComposerPrimitive.Input
             autoFocus
             rows={1}
