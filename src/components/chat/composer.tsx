@@ -1,9 +1,13 @@
 "use client";
 
-import { ArrowUp, Square, User, Users } from "lucide-react";
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  ArrowUp, Brain, Check, Code2, Lightbulb, ListChecks, PenLine, Plus, Square, Telescope, User, Users, X,
+} from "lucide-react";
 import { ComposerPrimitive, ThreadPrimitive } from "@assistant-ui/react";
 
-import { setMode, useAgentState } from "@/lib/agent-store";
+import { SKILLS, type SkillId, setMode, setSkill, useAgentState, useSkill } from "@/lib/agent-store";
 import { cn } from "@/lib/utils";
 
 function ModeToggle() {
@@ -34,6 +38,91 @@ function ModeToggle() {
   );
 }
 
+const SKILL_ICONS: Record<SkillId, typeof Brain> = {
+  "deep-think": Brain,
+  "deep-research": Telescope,
+  code: Code2,
+  write: PenLine,
+  summarize: ListChecks,
+  brainstorm: Lightbulb,
+};
+
+function SkillsMenu() {
+  const skill = useSkill();
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="relative shrink-0" dir="rtl">
+      <button
+        type="button"
+        aria-label="المهارات"
+        onClick={() => setOpen((o) => !o)}
+        className={cn(
+          "flex size-10 items-center justify-center rounded-2xl text-muted-foreground transition-all hover:bg-accent hover:text-foreground",
+          open && "rotate-45 bg-accent text-foreground",
+        )}
+      >
+        <Plus className="size-5" />
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: 8, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.97 }}
+            transition={{ duration: 0.15 }}
+            className="absolute bottom-12 right-0 z-30 w-64 rounded-2xl border border-border bg-card p-1.5 shadow-float"
+          >
+            {SKILLS.map((s) => {
+              const Icon = SKILL_ICONS[s.id];
+              const active = skill === s.id;
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => {
+                    setSkill(active ? null : s.id);
+                    setOpen(false);
+                  }}
+                  className={cn(
+                    "flex w-full items-center gap-3 rounded-xl px-3 py-2 text-right transition-colors hover:bg-accent",
+                    active && "bg-accent",
+                  )}
+                >
+                  <Icon className="size-4 shrink-0 text-primary" />
+                  <span className="flex-1">
+                    <span className="block text-sm font-medium">{s.label}</span>
+                    <span className="block text-[11px] text-muted-foreground">{s.hint}</span>
+                  </span>
+                  {active && <Check className="size-4 text-primary" />}
+                </button>
+              );
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function ActiveSkillChip() {
+  const skill = useSkill();
+  const s = SKILLS.find((x) => x.id === skill);
+  if (!s) return null;
+  const Icon = SKILL_ICONS[s.id];
+  return (
+    <button
+      type="button"
+      onClick={() => setSkill(null)}
+      className="mb-1 flex shrink-0 items-center gap-1.5 self-center rounded-full bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/15"
+      dir="rtl"
+    >
+      <Icon className="size-3.5" />
+      {s.label}
+      <X className="size-3" />
+    </button>
+  );
+}
+
 export function Composer() {
   const { agents, activeId } = useAgentState();
   const name = agents.find((a) => a.id === activeId)?.name ?? "Aria";
@@ -42,6 +131,8 @@ export function Composer() {
       <div className="pointer-events-auto mx-auto w-full max-w-3xl">
         <ModeToggle />
         <ComposerPrimitive.Root className="relative flex items-end gap-2 rounded-3xl border border-border bg-card/90 p-2 pl-4 shadow-float backdrop-blur-xl transition-colors focus-within:border-primary/50">
+          <SkillsMenu />
+          <ActiveSkillChip />
           <ComposerPrimitive.Input
             autoFocus
             rows={1}
@@ -49,6 +140,7 @@ export function Composer() {
             placeholder={`اكتب إلى ${name}…`}
             className="aria-textarea max-h-44 min-h-[2.75rem] flex-1 resize-none bg-transparent py-2.5 text-[0.97rem] leading-relaxed text-foreground outline-none placeholder:text-muted-foreground"
           />
+
 
           <ThreadPrimitive.If running={false}>
             <ComposerPrimitive.Send asChild>

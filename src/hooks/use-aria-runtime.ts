@@ -14,7 +14,7 @@ import {
   getThread,
   setThreadMessages,
 } from "@/lib/chat-store";
-import { getActiveAgent, getAgentState } from "@/lib/agent-store";
+import { getActiveAgent, getAgentState, getSkill } from "@/lib/agent-store";
 
 type StreamEvent =
   | { type: "text"; delta: string }
@@ -92,6 +92,7 @@ export function useAriaRuntime(threadId: string) {
             messages: toModelMessages(history),
             agent: { name: agent.name, personality: agent.personality, depth: agent.depth },
             mode,
+            skill: getSkill(),
           }),
           signal: controller.signal,
         });

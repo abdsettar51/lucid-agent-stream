@@ -5,7 +5,7 @@ import { createLovableAiGatewayProvider, DEFAULT_CHAT_MODEL } from "@/lib/ai-gat
 
 type IncomingMessage = { role: "user" | "assistant"; content: string };
 type Persona = { name?: string; personality?: string; depth?: "low" | "medium" | "high" };
-type ChatRequestBody = { messages?: IncomingMessage[]; agent?: Persona; mode?: "single" | "team" };
+type ChatRequestBody = { messages?: IncomingMessage[]; agent?: Persona; mode?: "single" | "team"; skill?: string | null };
 
 type Step = { id: string; label: string; status: "running" | "done" | "error"; agent?: string; detail?: string };
 type Event =
@@ -52,8 +52,19 @@ export const Route = createFileRoute("/api/chat")({
         if (!apiKey) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
 
         const persona = body.agent ?? {};
-        const depth = persona.depth ?? "medium";
-        const system = personaPrompt(persona);
+        const SKILL_PROMPTS: Record<string, string> = {
+          "deep-think": "SKILL: Deep thinking. Reason very carefully step by step, consider edge cases and alternatives, then give a precise, well-justified answer.",
+          "deep-research": "SKILL: Deep research. Produce a comprehensive research report: executive summary, background, multiple perspectives, key facts and data, pros/cons, open questions, and a conclusion with recommendations. Use headings and tables. Note uncertainty honestly.",
+          code: "SKILL: Coding expert. Write clean, production-quality code in fenced blocks with language tags, then briefly explain it.",
+          write: "SKILL: Professional writer. Produce polished, well-structured, engaging prose suitable for publishing.",
+          summarize: "SKILL: Summarizer. Give a concise summary as short bullet points with the key takeaways first.",
+          brainstorm: "SKILL: Brainstorming. Generate many diverse, creative ideas grouped by theme, each with a one-line rationale.",
+        };
+        const skillKey = typeof body.skill === "string" ? body.skill : "";
+        const deepSkill = skillKey === "deep-think" || skillKey === "deep-research";
+        const depth = deepSkill ? "high" : (persona.depth ?? "medium");
+        const system = personaPrompt(persona) + (SKILL_PROMPTS[skillKey] ? `\n\n${SKILL_PROMPTS[skillKey]}` : "");
+        if (skillKey === "deep-research") body.mode = "team";
         const modelMessages: ModelMessage[] = messages
           .filter((m) => typeof m.content === "string" && m.content.length > 0)
           .map((m) => ({ role: m.role, content: m.content }) as ModelMessage);
