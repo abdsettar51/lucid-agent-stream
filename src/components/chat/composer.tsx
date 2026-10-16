@@ -66,12 +66,27 @@ function SkillsMenu() {
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: 8, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 8, scale: 0.97 }}
-            transition={{ duration: 0.15 }}
-            className="absolute bottom-12 right-0 z-30 w-64 rounded-2xl border border-border bg-card p-1.5 shadow-float"
+            key="backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setOpen(false)}
+            className="fixed inset-0 z-40 bg-foreground/30 backdrop-blur-[2px] sm:bg-transparent sm:backdrop-blur-none"
+          />
+        )}
+        {open && (
+          <motion.div
+            key="menu"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 24 }}
+            transition={{ type: "spring", damping: 30, stiffness: 340 }}
+            className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-2 gap-2 rounded-t-3xl border border-border bg-card p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-float sm:absolute sm:inset-x-auto sm:bottom-12 sm:left-0 sm:block sm:w-72 sm:space-y-0.5 sm:rounded-2xl sm:p-1.5"
           >
+            <div className="col-span-2 mb-1 flex flex-col items-center gap-2 sm:hidden">
+              <span className="h-1 w-10 rounded-full bg-muted" />
+              <p className="text-sm font-semibold">اختر مهارة</p>
+            </div>
             {SKILLS.map((s) => {
               const Icon = SKILL_ICONS[s.id];
               const active = skill === s.id;
